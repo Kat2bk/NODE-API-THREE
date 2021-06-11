@@ -8,14 +8,29 @@ const {validateUserId, validateUser, validatePost} = require('../middleware/midd
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
+  try {
+    const users = await userData.get();
+    if (users) {
+      res.status(200).json(users)
+    } 
+  } catch (error) {
+    console.log(error.message)
+    next(error)
+  }
 
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId, async (req, res, next) => {
   // RETURN THE USER OBJECT
   // this needs a middleware to verify user id
+  try {
+    const user = await userData.getById(req.params.id)
+    res.status(200).json(user)
+  } catch (error) {
+    next(error)
+  }
 });
 
 router.post('/', (req, res) => {
@@ -46,4 +61,5 @@ router.post('/:id/posts', (req, res) => {
 });
 
 // do not forget to export the router
+
 module.exports = router;

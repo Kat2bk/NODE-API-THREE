@@ -11,8 +11,8 @@ function logger() {
 //   - this middleware runs on every request made to the API
 
 function validateUserId(req, res, next) {
-  if (req.params.id) {
-    req.user = req.params.id;
+  if (req.id) {
+    req.user = req.id;
     next();
   } else {
     res.status(404).json({message: "user not found"})
