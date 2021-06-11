@@ -1,12 +1,21 @@
 const express = require('express');
 const userData = require('./users-model');
 const postData = require('../posts/posts-model');
-const {validateUserId, validateUser, validatePost} = require('../middleware/middleware');
+const {validateUser, validatePost} = require('../middleware/middleware');
 
 // You will need `users-model.js` and `posts-model.js` both
 // The middleware functions also need to be required
 
 const router = express.Router();
+
+function validateUserId(req, res, next) {
+    if (req.params.id) {
+      req.user = req.params.id;
+      next()
+    } else {
+      res.status(404).json({message: "user not found"})
+    }
+}
 
 router.get('/', async (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
@@ -27,21 +36,33 @@ router.get('/:id', validateUserId, async (req, res, next) => {
   // this needs a middleware to verify user id
   try {
     const user = await userData.getById(req.params.id)
-    res.status(200).json(user)
+      res.status(200).json(user)
+  } catch (error) {
+    console.error(error.message)
+    next(error)
+  }
+});
+
+router.post('/', validateUser, async (req, res, next) => {
+  // RETURN THE NEWLY CREATED USER OBJECT
+  // this needs a middleware to check that the request body is valid
+  try {
+    const newUser = await userData.insert(req.body)
+    res.status(201).json(newUser)
   } catch (error) {
     next(error)
   }
 });
 
-router.post('/', (req, res) => {
-  // RETURN THE NEWLY CREATED USER OBJECT
-  // this needs a middleware to check that the request body is valid
-});
-
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res, next) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+  try {
+    
+  } catch (error) {
+    next(error)
+  }
 });
 
 router.delete('/:id', (req, res) => {
