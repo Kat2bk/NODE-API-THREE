@@ -13,7 +13,13 @@ server.use(logger())
 server.use('/api/users', userRouter)
 
 server.get('/', (req, res) => {
+  // throw new Error('arrghh')
   res.send(`<h2>Let's write some middleware!</h2>`);
 });
+
+ server.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500).json({message: "Something went wrong, try again"})
+})
 
 module.exports = server;
